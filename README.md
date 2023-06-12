@@ -74,8 +74,8 @@ personal_access_token = "ghp_faketoken"
 hostname = "github.examplecompany.com"
 
 # (Optional) The list of queries to search. Any issue that appears in at least
-# one of the query results will be processed. The default query searched for
-# PRs that involves the current authenticated user.
+# one of the query results will be processed. The default query searches for
+# open PRs that involves the current authenticated user.
 #
 # Default: ["is:open is:pr involves:@me"]
 queries = [
