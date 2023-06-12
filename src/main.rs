@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::clients::cache::{CacheClient, PullRequest};
-use crate::clients::github::{GithubClient, Issue};
+use crate::clients::github::{GithubClient, Issue, ReviewState};
 use crate::clients::ntfy::NtfyClient;
 use crate::feedback::{Comment, Review};
 use anyhow::Result;
@@ -81,6 +81,7 @@ async fn main() -> Result<()> {
         // attach review comments to their reviews
         let mut reviews_by_ids: HashMap<usize, Review> = reviews_response
             .into_iter()
+            .filter(|x| x.state != ReviewState::Pending)
             .map(|x| {
                 (
                     x.id,

@@ -59,9 +59,10 @@ pub struct Comment {
     pub html_url: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum ReviewState {
+    Pending,
     Commented,
     Approved,
     ChangesRequested,
