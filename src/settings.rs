@@ -7,6 +7,7 @@ use serde::Deserialize;
 pub struct Github {
     pub personal_access_token: String,
     pub hostname: String,
+    pub queries: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -55,6 +56,7 @@ impl Settings {
             .add_source(File::with_name(Self::default_config_path()?.as_str()))
             .add_source(Environment::with_prefix("prnotify"))
             .set_default("github.hostname", "github.com")?
+            .set_default("github.queries", vec!["is:open is:pr involves:@me"])?
             .build()?;
 
         let mut settings: Settings = config.try_deserialize()?;

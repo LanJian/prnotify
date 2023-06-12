@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::clients::cache::{CacheClient, PullRequest};
-use crate::clients::github::GithubClient;
+use crate::clients::github::{GithubClient, Issue};
 use crate::clients::ntfy::NtfyClient;
 use crate::feedback::{Comment, Review};
 use anyhow::Result;
@@ -43,11 +43,17 @@ async fn main() -> Result<()> {
     let current_data = cache_client.read().unwrap_or_default();
 
     // get relevant requests from github
-    let prs_response = github_client.pull_requests().await?;
+    let mut prs_by_ids: HashMap<usize, Issue> = HashMap::default();
+    for query in settings.github.queries {
+        let prs_response = github_client.pull_requests(&query).await?;
+        for pr in prs_response.items {
+            prs_by_ids.entry(pr.id).or_insert(pr);
+        }
+    }
 
     let mut new_data = HashMap::default();
 
-    for pr in prs_response.items {
+    for (_, pr) in prs_by_ids {
         let repo_owner = pr.repo_owner()?;
         let repo_name = pr.repo_name()?;
 

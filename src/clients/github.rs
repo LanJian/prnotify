@@ -108,11 +108,11 @@ impl GithubClient {
     }
 
     /// Returns a list of pull requests that involves the authenticated user
-    pub async fn pull_requests(&self) -> Result<SearchIssuesResponse> {
+    pub async fn pull_requests(&self, query: &str) -> Result<SearchIssuesResponse> {
         let response = self
             .client
             .get(format!("{}/search/issues", self.base_url))
-            .query(&[("q", "is:open is:pr involves:@me"), ("per_page", "100")])
+            .query(&[("q", query), ("per_page", "100")])
             .send()
             .await?;
 

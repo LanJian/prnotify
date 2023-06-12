@@ -73,6 +73,16 @@ personal_access_token = "ghp_faketoken"
 # Default: github.com
 hostname = "github.examplecompany.com"
 
+# (Optional) The list of queries to search. Any issue that appears in at least
+# one of the query results will be processed. The default query searched for
+# PRs that involves the current authenticated user.
+#
+# Default: ["is:open is:pr involves:@me"]
+queries = [
+  "is:open is:pr involves:@me",
+  "is:open is:pr label:example-label"
+]
+
 # (Required) Settings for connecting to ntfy
 [ntfy]
 # (Required) The base url of the ntfy server
