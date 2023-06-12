@@ -101,6 +101,9 @@ impl fmt::Display for Review {
         if self.comments.len() > 1 {
             writeln!(f, "")?;
             writeln!(f, "(+ {} comments)", self.comments.len())?;
+        } else if self.body.is_some() && self.comments.len() == 1 {
+            writeln!(f, "")?;
+            writeln!(f, "(+ 1 comment)")?;
         }
 
         Ok(())
