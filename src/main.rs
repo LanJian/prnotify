@@ -70,6 +70,7 @@ async fn main() -> Result<()> {
 
         let comments_by_ids: HashMap<usize, Comment> = comments_response
             .into_iter()
+            .filter(|x| x.user.login != settings.github.username)
             .map(|x| {
                 (
                     x.id,
@@ -81,7 +82,7 @@ async fn main() -> Result<()> {
         // attach review comments to their reviews
         let mut reviews_by_ids: HashMap<usize, Review> = reviews_response
             .into_iter()
-            .filter(|x| x.state != ReviewState::Pending)
+            .filter(|x| x.state != ReviewState::Pending && x.user.login != settings.github.username)
             .map(|x| {
                 (
                     x.id,

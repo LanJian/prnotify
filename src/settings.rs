@@ -7,6 +7,7 @@ use serde::Deserialize;
 pub struct Github {
     pub personal_access_token: String,
     pub hostname: String,
+    pub username: String,
     pub queries: Vec<String>,
 }
 
