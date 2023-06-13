@@ -6,9 +6,11 @@ A Github PR notifier that does not listen on webhooks and therefore does not
 need to be installed into a Github org or repo. Only a Github personal access
 token is required.
 
-The notifier pulls PRs that involves the current user and sends a notification
-using [ntfy](https://ntfy.sh/) for any new PRs opened, new comments, or new
-reviews.
+The notifier pulls PRs using the provided search queries. It then sends a
+notification using [ntfy](https://ntfy.sh/) for any:
+  * New PRs opened
+  * New comments
+  * New reviews
 
 ## Usage
 
@@ -66,6 +68,10 @@ the prefix `PRNOTIFY`. Examples:
 [github]
 # (Required) The personal access token to authenticate with Github
 personal_access_token = "ghp_faketoken"
+
+# (Required) The username of the authenticated user. Comments made by this user
+# are filtered out and will not trigger notifications.
+username = "fake-user"
 
 # (Optional) The hostname of the Github API to connect to. Specify this if you
 # are connecting to a Github Enterprise server.
