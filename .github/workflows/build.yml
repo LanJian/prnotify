@@ -15,5 +15,6 @@ jobs:
         with:
           toolchain: 1.69
           target: x86_64-unknown-linux-musl
+          override: true
       - run: cargo test
       - run: cargo build --release --target=x86_64-unknown-linux-musl
