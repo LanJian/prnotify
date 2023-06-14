@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends musl-tools
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: 1.69
