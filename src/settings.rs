@@ -1,3 +1,5 @@
+use std::{path::PathBuf};
+
 use anyhow::{anyhow, Result};
 use config::{Config, Environment, File};
 use directories::ProjectDirs;
@@ -40,25 +42,39 @@ impl Settings {
         Ok(shellexpand::full(path)?.into_owned())
     }
 
-    fn default_config_path() -> Result<String> {
+    fn user_config_path() -> Result<PathBuf> {
         let mut toml_path = ProjectDirs::from("", "", "prnotify")
             .ok_or_else(|| anyhow!("Could not determine default config path"))?
             .config_dir()
             .to_path_buf();
         toml_path.push("prnotify.toml");
-        toml_path
-            .to_str()
-            .map(|x| x.to_owned())
-            .ok_or_else(|| anyhow!("Could not determine default config path"))
+        Ok(toml_path)
     }
 
     pub fn try_new() -> Result<Self> {
-        let config = Config::builder()
-            .add_source(File::with_name(Self::default_config_path()?.as_str()))
-            .add_source(Environment::with_prefix("prnotify"))
-            .set_default("github.hostname", "github.com")?
-            .set_default("github.queries", vec!["is:open is:pr involves:@me"])?
-            .build()?;
+        let user_config_path = Self::user_config_path()?;
+        let system_config_path = PathBuf::from("/etc/prnotify/prnotify.toml");
+
+        let mut builder = Config::builder();
+
+        if user_config_path.exists() {
+            let path = user_config_path
+                .to_str()
+                .ok_or_else(|| anyhow!("Could not determine user config path"))?;
+            builder = builder.add_source(File::with_name(path));
+        }
+
+        if system_config_path.exists() {
+            let path = system_config_path
+                .to_str()
+                .ok_or_else(|| anyhow!("Could not determine system config path"))?;
+            builder = builder.add_source(File::with_name(path));
+        }
+
+        builder = builder.add_source(Environment::with_prefix("prnotify"));
+        builder = builder.set_default("github.hostname", "github.com")?;
+        builder = builder.set_default("github.queries", vec!["is:open is:pr involves:@me"])?;
+        let config = builder.build()?;
 
         let mut settings: Settings = config.try_deserialize()?;
 
