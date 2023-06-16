@@ -1,4 +1,4 @@
-use std::{path::PathBuf};
+use std::path::PathBuf;
 
 use anyhow::{anyhow, Result};
 use config::{Config, Environment, File};
@@ -71,7 +71,11 @@ impl Settings {
             builder = builder.add_source(File::with_name(path));
         }
 
-        builder = builder.add_source(Environment::with_prefix("prnotify"));
+        builder = builder.add_source(
+            Environment::with_prefix("PRNOTIFY")
+                .separator("__")
+                .list_separator(","),
+        );
         builder = builder.set_default("github.hostname", "github.com")?;
         builder = builder.set_default("github.queries", vec!["is:open is:pr involves:@me"])?;
         let config = builder.build()?;
