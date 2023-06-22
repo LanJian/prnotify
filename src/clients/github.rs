@@ -2,7 +2,7 @@ use anyhow::{anyhow, Result};
 use regex::Regex;
 use reqwest::{
     header::{HeaderMap, ACCEPT, AUTHORIZATION, COOKIE},
-    Client,
+    Client, Proxy,
 };
 use serde::{de::DeserializeOwned, Deserialize};
 
@@ -91,7 +91,12 @@ pub struct GithubClient {
 }
 
 impl GithubClient {
-    pub fn try_new(access_token: &str, base_url: String, cookie: Option<String>) -> Result<Self> {
+    pub fn try_new(
+        access_token: &str,
+        base_url: String,
+        cookie: Option<String>,
+        proxy_url: Option<String>,
+    ) -> Result<Self> {
         let mut headers = HeaderMap::new();
         headers.insert(ACCEPT, "application/vnd.github+json".parse()?);
         headers.insert(AUTHORIZATION, format!("Bearer {}", access_token).parse()?);
@@ -100,8 +105,14 @@ impl GithubClient {
             headers.insert(COOKIE, unwrapped.parse()?);
         }
 
+        let mut builder = Client::builder();
+        if let Some(url) = proxy_url {
+            builder = builder.proxy(Proxy::https(url)?);
+        }
+        builder = builder.default_headers(headers);
+
         let github_client = Self {
-            client: Client::builder().default_headers(headers).build()?,
+            client: builder.build()?,
             base_url,
         };
 

@@ -11,6 +11,7 @@ pub struct Github {
     pub hostname: String,
     pub username: String,
     pub queries: Vec<String>,
+    pub proxy_url: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]

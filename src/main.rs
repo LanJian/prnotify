@@ -37,6 +37,7 @@ async fn main() -> Result<()> {
         &settings.github.personal_access_token,
         format!("https://{}/api/v3", settings.github.hostname),
         cookies,
+        settings.github.proxy_url,
     )?;
 
     // read data stored in cache
