@@ -58,17 +58,17 @@ impl Settings {
 
         let mut builder = Config::builder();
 
-        if user_config_path.exists() {
-            let path = user_config_path
-                .to_str()
-                .ok_or_else(|| anyhow!("Could not determine user config path"))?;
-            builder = builder.add_source(File::with_name(path));
-        }
-
         if system_config_path.exists() {
             let path = system_config_path
                 .to_str()
                 .ok_or_else(|| anyhow!("Could not determine system config path"))?;
+            builder = builder.add_source(File::with_name(path));
+        }
+
+        if user_config_path.exists() {
+            let path = user_config_path
+                .to_str()
+                .ok_or_else(|| anyhow!("Could not determine user config path"))?;
             builder = builder.add_source(File::with_name(path));
         }
 

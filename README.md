@@ -14,7 +14,33 @@ notification using [ntfy](https://ntfy.sh/) for any:
 
 ## Usage
 
-Check out the repo, create a configuration file(see below), and run:
+### Docker
+
+A docker image is published at
+[`jackhxs/prnotify`](https://hub.docker.com/r/jackhxs/prnotify).
+
+Create a configuration file(see [below](#configuration)) and a cache directory on the host
+machine and mount them into the container. You can optionally provide config
+values via environment variables, this may be desirable for specifying secrets.
+Example docker command:
+
+```sh
+docker run \
+  --volume /path/to/prnotify/config.toml:/etc/prnotify/prnotify.toml \
+  --volume /path/to/prnotify/cache-dir:/var/cache/prnotify \
+  --env PRNOTIFY__GITHUB__PERSONAL_ACCESS_TOKEN=ghp_faketoken \
+  jackhxs/prnotify:latest
+```
+
+To poll periodically, make a cron job. Example cron:
+```crontab
+# Run every 5 minutes and append output to a log file
+*/5 * * * * docker run [args...] >> /home/fakeuser/.local/log/prnotify.log 2>&1
+```
+
+### Source
+
+Check out the repo, create a configuration file(see [below](#configuration)), and run:
 ```sh
 cargo run --release
 ```
@@ -35,9 +61,13 @@ authenticate to Github. A token can be created by following the
 
 In some cases, the PAT is not enough to authenticate with Github
 programatically. For example, custom Github Enterprise or SSO setups.
-In these cases, `prnotify` can extract cookies from Firefox cookies storage
-and pass it along with requests to Github. See the Configuration section for
-more details.
+In these cases, `prnotify` provides some options:
+
+* Extract cookies from Firefox cookies storage and pass it along with requests
+to Github
+* Pass requests to Github through a HTTP proxy
+
+See the [Configuration](#configuration) section for more details.
 
 ### ntfy
 
@@ -50,16 +80,31 @@ is not easily guessable per ntfy's [documentation](https://docs.ntfy.sh/publish/
 
 Configuration is loaded and merged from the following sources in order:
 
-#### 1. `$XDG_CONFIG_HOME/prnotify/prnotify.toml`
+#### 1. System config file path:
 
-On Linux, this defaults to `$HOME/.config/prnotify/prnotify.toml`
+On Linux and Mac: `/etc/prnotify/prnotify.toml`
 
-#### 2. Environment variables:
+#### 2. Default user config file path:
+
+* On Linux: `$XDG_CONFIG_HOME/prnotify/prnotify.toml`
+or `$HOME/.config/prnotify/prnotify.toml`
+* On Mac: `$HOME/Library/Application Support/prnotify/prnotify.toml`
+
+#### 3. Environment variables:
 
 All configuration options can be set as env vars in `SCREAMING_SNAKE_CASE` with
-the prefix `PRNOTIFY`. Examples:
-* `export PRNOTIFY_GITHUB_HOSTNAME=github.examplecompany.com`
-* `export PRNOTIFY_NTFY_TOPIC=example-topic`
+the prefix `PRNOTIFY`. Nested attributes are separated by `__`. Examples:
+* `export PRNOTIFY__GITHUB__HOSTNAME=github.examplecompany.com`
+* `export PRNOTIFY__NTFY__BASE_URL=ntfy.exampledomain.com`
+* `export PRNOTIFY__NTFY__TOPIC=example-topic`
+
+---
+
+Additionally, the log level(default `INFO`) can be set via the `RUST_LOG`
+environment variables. To get more verbose logs:
+```
+export RUST_LOG=debug
+```
 
 ### Configuration Options
 
@@ -78,6 +123,9 @@ username = "fake-user"
 #
 # Default: github.com
 hostname = "github.examplecompany.com"
+
+# (Optional) The URL of the proxy server to send Github API requests through.
+proxy_url = "http://fake-ip-or-hostname:5678"
 
 # (Optional) The list of queries to search. Any issue that appears in at least
 # one of the query results will be processed. The default query searches for
