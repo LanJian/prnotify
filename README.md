@@ -12,7 +12,7 @@ notification using [ntfy](https://ntfy.sh/) for any:
   * New comments
   * New reviews
 
-## Usage
+## Setup and Usage
 
 ### Docker
 
@@ -22,8 +22,8 @@ A docker image is published at
 Create a configuration file(see [below](#configuration)) and a cache directory on the host
 machine and mount them into the container. You can optionally provide config
 values via environment variables, this may be desirable for specifying secrets.
-Example docker command:
 
+Example docker command:
 ```sh
 docker run \
   --volume /path/to/prnotify/config.toml:/etc/prnotify/prnotify.toml \
@@ -36,6 +36,112 @@ To poll periodically, make a cron job. Example cron:
 ```crontab
 # Run every 5 minutes and append output to a log file
 */5 * * * * docker run [args...] >> /home/fakeuser/.local/log/prnotify.log 2>&1
+```
+
+### Kubernetes
+
+To poll periodically, set up a `CronJob` in Kubernetes. You'll also need to
+create a `ConfigMap` and a `PersistentVolumeClaim` for the config file and the
+cache directory respectively. You can optionally provide config values via
+secrets and environment variables.
+
+Example Kubernetes manifests:
+
+#### `pvc.yaml`
+```yaml
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prnotify-cache-pvc
+  namespace: prnotify
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Mi
+```
+
+#### `secret.yaml`
+This example is only for demonstration purpose. Don't check secrets into source
+control. Instead, you can use `kubectl create secret` to create a secret, or
+refer to the docs for [Kubernetes
+secrets](https://kubernetes.io/docs/concepts/configuration/secret/) for other
+options.
+
+```yaml
+---
+apiVersion: v1
+data:
+  PRNOTIFY__GITHUB__PERSONAL_ACCESS_TOKEN: base64-encoded-github-pat
+kind: Secret
+metadata:
+  name: prnotify-raw-secrets
+  namespace: prnotify
+```
+
+#### `config-map.yaml`
+See [below](#configuration) for all the config options.
+```yaml
+---
+apiVersion: v1
+data:
+  settings.toml: |
+    [github]
+    username = "fake-user"
+
+    [ntfy]
+    base_url = "https://ntfy.exampledomain.com"
+    topic = "example-topic"
+
+    [cache]
+    path = "/var/cache/prnotify/prnotify.json"
+kind: ConfigMap
+metadata:
+  name: prnotify-config-map
+  namespace: prnotify
+```
+
+#### `cron-job.yaml`
+```yaml
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: prnotify-cronjob
+  namespace: prnotify
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: prnotify
+              image: jackhxs/prnotify:latest
+              imagePullPolicy: Always
+              envFrom:
+                - secretRef:
+                    name: prnotify-raw-secrets
+              volumeMounts:
+                - name: settings
+                  mountPath: /etc/prnotify
+                - name: cache
+                  mountPath: /var/cache/prnotify
+          volumes:
+            - name: settings
+              configMap:
+                name: prnotify-config-map
+                items:
+                  - key: settings.toml
+                    path: prnotify.toml
+            - name: cache
+              persistentVolumeClaim:
+                claimName: prnotify-cache-pvc
 ```
 
 ### Source
