@@ -10,8 +10,9 @@ pub struct Github {
     pub personal_access_token: String,
     pub hostname: String,
     pub username: String,
-    pub queries: Vec<String>,
     pub proxy_url: Option<String>,
+    pub queries: Vec<String>,
+    pub exclude_comment_patterns: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -79,6 +80,7 @@ impl Settings {
         );
         builder = builder.set_default("github.hostname", "github.com")?;
         builder = builder.set_default("github.queries", vec!["is:open is:pr involves:@me"])?;
+        builder = builder.set_default::<&str, Vec<&str>>("github.exclude_comment_patterns", vec![])?;
         let config = builder.build()?;
 
         let mut settings: Settings = config.try_deserialize()?;

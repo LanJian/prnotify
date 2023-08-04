@@ -243,6 +243,15 @@ queries = [
   "is:open is:pr label:example-label"
 ]
 
+# (Optional) List of comment patterns to exclude. If a comment matches any of
+# the patterns, it will be ignored and not trigger a notification.
+#
+# Default: []
+exclude_comment_patterns = [
+  "^.*filtered pattern.*%",
+  "^.*another filtered pattern.*%",
+]
+
 # (Required) Settings for connecting to ntfy
 [ntfy]
 # (Required) The base url of the ntfy server
