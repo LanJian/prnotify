@@ -243,8 +243,9 @@ queries = [
   "is:open is:pr label:example-label"
 ]
 
-# (Optional) List of comment patterns to exclude. If a comment matches any of
-# the patterns, it will be ignored and not trigger a notification.
+# (Optional) List of comment patterns to exclude. Each pattern is parsed as a
+# regular expression.If a comment matches any of the patterns, it will be
+# ignored and not trigger a notification.
 #
 # Default: []
 exclude_comment_patterns = [
