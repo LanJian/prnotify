@@ -66,6 +66,7 @@ pub enum ReviewState {
     Commented,
     Approved,
     ChangesRequested,
+    Dismissed,
 }
 
 #[derive(Debug, Deserialize)]

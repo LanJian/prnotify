@@ -42,7 +42,7 @@ impl From<github::ReviewState> for ReviewState {
             github::ReviewState::Approved => Self::Approved,
             github::ReviewState::ChangesRequested => Self::ChangesRequested,
             github::ReviewState::Commented => Self::Commented,
-            _ => Self::Commented, // don't support other states like "Pending"
+            _ => Self::Commented, // don't support other states like "Pending" or "Dismissed"
         }
     }
 }
