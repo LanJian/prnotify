@@ -178,7 +178,7 @@ See the [Configuration](#configuration) section for more details.
 ### ntfy
 
 Requests to ntfy currently isn't authenticated. Options for using ntfy are:
-1. (Recommended) Run a self-hosted internal ntfy server. 
+1. (Recommended) Run a self-hosted internal ntfy server.
 2. Use the public server at https://ntfy.sh. Be sure to pick a topic name that
 is not easily guessable per ntfy's [documentation](https://docs.ntfy.sh/publish/)
 
@@ -227,7 +227,7 @@ username = "fake-user"
 # (Optional) The hostname of the Github API to connect to. Specify this if you
 # are connecting to a Github Enterprise server.
 #
-# Default: github.com
+# Default: api.github.com
 hostname = "github.examplecompany.com"
 
 # (Optional) The URL of the proxy server to send Github API requests through.
