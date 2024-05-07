@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Result};
 use regex::Regex;
 use reqwest::{
-    header::{HeaderMap, ACCEPT, AUTHORIZATION, COOKIE},
+    header::{HeaderMap, ACCEPT, AUTHORIZATION, COOKIE, USER_AGENT},
     Client, Proxy,
 };
 use serde::{de::DeserializeOwned, Deserialize};
@@ -101,6 +101,7 @@ impl GithubClient {
         let mut headers = HeaderMap::new();
         headers.insert(ACCEPT, "application/vnd.github+json".parse()?);
         headers.insert(AUTHORIZATION, format!("Bearer {}", access_token).parse()?);
+        headers.insert(USER_AGENT, "prnotify".parse()?);
 
         if let Some(unwrapped) = cookie {
             headers.insert(COOKIE, unwrapped.parse()?);

@@ -45,7 +45,7 @@ async fn main() -> Result<()> {
     let ntfy_client = NtfyClient::try_new(settings.ntfy.base_url, settings.ntfy.topic)?;
     let github_client = GithubClient::try_new(
         &settings.github.personal_access_token,
-        format!("https://{}/api/v3", settings.github.hostname),
+        format!("https://{}", settings.github.hostname),
         cookies,
         settings.github.proxy_url,
     )?;
